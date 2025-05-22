@@ -54,18 +54,36 @@ export default function Home() {
         </form>
         {error && <p className="error-modern">{error}</p>}
         {result && (
-          <div className="result-modern">
-            <div className="result-row">
-              <span className="result-label">Original:</span>
-              <span className="result-value">{result.url}</span>
-            </div>
-            <div className="result-row">
-              <span className="result-label">Lnk.io:</span>
-              <span className="result-value short-url">{result.shortUrl}</span>
-              <button onClick={handleCopy} className="copy-btn-modern">{copied ? 'Copied!' : 'Copy'}</button>
-            </div>
-          </div>
+  <div className="form-modern" style={{ marginBottom: 0, marginTop: 18 }}>
+    <input
+      type="text"
+      className="input-modern"
+      value={result.shortUrl}
+      readOnly
+      tabIndex={-1}
+      style={{ marginBottom: 0, flex: 1 }}
+    />
+    <div style={{ display: 'flex', gap: '6px' }}>
+      <button onClick={handleCopy} className="btn-modern" title="Copiar" style={{ padding: '0 7px', minWidth: 32, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {copied ? (
+          <span style={{fontSize: '0.90em'}}>Copiado!</span>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24">
+            <rect x="9" y="9" width="13" height="13" rx="2" fill="none" stroke="#fff" strokeWidth="2"/>
+            <rect x="3" y="3" width="13" height="13" rx="2" fill="none" stroke="#fff" strokeWidth="2"/>
+          </svg>
         )}
+      </button>
+      <a href={result.shortUrl} target="_blank" rel="noopener noreferrer" className="btn-modern" title="Abrir em nova aba" style={{ padding: '0 7px', minWidth: 32, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24">
+          <path d="M14 3h7v7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M10 14L21 3" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <rect x="3" y="7" width="14" height="14" rx="2" stroke="#fff" strokeWidth="2"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+)}
       </div>
       <style jsx>{`
         .bg-gradient {
@@ -193,6 +211,51 @@ export default function Home() {
             gap: 10px;
           }
           .btn-modern {
+.result-tinyurl-style {
+  width: 100%;
+  background: #f3f4f6;
+  border-radius: 12px;
+  padding: 18px 14px 18px 14px;
+  margin-top: 10px;
+  box-shadow: 0 1px 4px rgba(99,102,241,0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.short-url-input {
+  margin-bottom: 0;
+  text-align: left;
+  font-weight: 700;
+  color: #2563eb;
+  background: #fff;
+  cursor: pointer;
+  width: 100%;
+}
+.actions-tiny {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 16px;
+}
+.icon-btn {
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-btn:active {
+  background: #4338ca;
+}
+
             width: 100%;
             padding: 10px 0;
           }
