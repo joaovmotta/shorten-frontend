@@ -50,7 +50,7 @@ export default function Home() {
             required
             className="input-modern"
           />
-          <button type="submit" disabled={loading} className="btn-modern">{loading ? 'Sending...' : 'Go'}</button>
+          <button type="submit" disabled={loading} className="btn-modern">{loading ? 'Sending...' : 'Shorten'}</button>
         </form>
         {error && <p className="error-modern">{error}</p>}
         {result && (
@@ -68,9 +68,9 @@ export default function Home() {
         {copied ? (
           <span style={{fontSize: '0.90em'}}>Copiado!</span>
         ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24">
-            <rect x="9" y="9" width="13" height="13" rx="2" fill="none" stroke="#fff" strokeWidth="2"/>
-            <rect x="3" y="3" width="13" height="13" rx="2" fill="none" stroke="#fff" strokeWidth="2"/>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+            <rect x="7" y="7" width="12" height="12" rx="2" fill="none" stroke="#fff" strokeWidth="2"/>
+            <rect x="3" y="3" width="12" height="12" rx="2" fill="none" stroke="#fff" strokeWidth="2"/>
           </svg>
         )}
       </button>
