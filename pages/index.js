@@ -14,7 +14,7 @@ export default function Home() {
     setResult(null);
     setCopied(false);
     try {
-      const res = await fetch('http://localhost:8080/api/v1/shorten', {
+      const res = await fetch('shorten-url.railway.internal/api/v1/shorten', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: inputUrl })
