@@ -1,23 +1,67 @@
 import { useState } from 'react';
 
+import { useEffect, useRef } from 'react';
 export default function Home() {
   const [inputUrl, setInputUrl] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState(false);  const [customUrl, setCustomUrl] = useState('');
+  const recaptchaRef = useRef(null);
+  const [recaptchaToken, setRecaptchaToken] = useState('');
+
+  useEffect(() => {
+    // Carrega o script do reCAPTCHA apenas uma vez
+    if (!document.querySelector('script[src="https://www.google.com/recaptcha/api.js"]')) {
+      const script = document.createElement('script');
+      script.src = 'https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit';
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    }
+    window.onRecaptchaSuccess = (token) => {
+      setRecaptchaToken(token);
+    };
+    window.recaptchaWidgetId = null;
+    window.onloadCallback = () => {
+      if (
+        window.grecaptcha &&
+        document.getElementById('g-recaptcha') &&
+        window.recaptchaWidgetId === null
+      ) {
+        window.recaptchaWidgetId = window.grecaptcha.render('g-recaptcha', {
+          sitekey: '6LelyUsrAAAAABNrTl6VII8CT8JXWOIfQ14j9pVV',
+          callback: window.onRecaptchaSuccess
+        });
+      }
+    };
+    return () => {
+      window.onRecaptchaSuccess = undefined;
+      window.onloadCallback = undefined;
+      window.recaptchaWidgetId = null;
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!recaptchaToken) {
+      setError('Por favor, confirme o reCAPTCHA.');
+      return;
+    }
     setLoading(true);
     setError('');
     setResult(null);
     setCopied(false);
     try {
+      const body = { url: inputUrl };
+      if (customUrl) body.customUrl = customUrl;
       const res = await fetch('https://shorten-url-production-3f16.up.railway.app/api/v1/shorten', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: inputUrl })
+        headers: { 
+          'Content-Type': 'application/json',
+          'recaptcha-token': recaptchaToken
+        },
+        body: JSON.stringify(body)
       });
       if (!res.ok) throw new Error('Erro ao encurtar a URL');
       const data = await res.json();
@@ -26,6 +70,8 @@ export default function Home() {
       setError(err.message);
     } finally {
       setLoading(false);
+      if (window.grecaptcha) window.grecaptcha.reset();
+      setRecaptchaToken('');
     }
   };
 
@@ -41,17 +87,38 @@ export default function Home() {
     <div className="bg-gradient">
       <div className="card">
         <h1 className="logo">Lnk<span>.io</span></h1>
-        <form onSubmit={handleSubmit} className="form-modern">
-          <input
-            type="text"
-            placeholder="Paste your URL here..."
-            value={inputUrl}
-            onChange={e => setInputUrl(e.target.value)}
-            required
-            className="input-modern"
-          />
-          <button type="submit" disabled={loading} className="btn-modern">{loading ? 'Sending...' : 'Shorten'}</button>
-        </form>
+        <form onSubmit={handleSubmit} className="form-modern" style={{ flexDirection: 'column', gap: 0, width: '100%' }}>
+  <div style={{ display: 'flex', flexDirection: 'row', gap: 10, width: '100%', marginBottom: 10 }}>
+    <input
+      type="text"
+      placeholder="Paste your URL here..."
+      value={inputUrl}
+      onChange={e => setInputUrl(e.target.value)}
+      required
+      className="input-modern"
+      style={{ flex: 1, marginBottom: 0 }}
+    />
+  </div>
+  <div style={{ display: 'flex', flexDirection: 'row', gap: 10, width: '100%', marginBottom: 14 }}>
+    <input
+      type="text"
+      placeholder="Custom url (opcional)"
+      value={customUrl}
+      onChange={e => setCustomUrl(e.target.value)}
+      className="input-modern"
+      style={{ flex: 1, marginBottom: 0 }}
+    />
+  </div>
+  <div style={{ marginBottom: 10, width: '100%' }}>
+    <div
+      id="g-recaptcha"
+      className="g-recaptcha"
+      data-sitekey="6LelyUsrAAAAABNrTl6VII8CT8JXWOIfQ14j9pVV"
+      data-callback="onRecaptchaSuccess"
+    ></div>
+  </div>
+  <button type="submit" disabled={loading} className="btn-modern" style={{ width: '100%', marginBottom: 0, whiteSpace: 'nowrap', paddingTop: 14, paddingBottom: 14 }}>{loading ? 'Sending...' : 'Shorten'}</button>
+</form>
         {error && <p className="error-modern">{error}</p>}
         {result && (
   <div className="form-modern" style={{ marginBottom: 0, marginTop: 18 }}>
