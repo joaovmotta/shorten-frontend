@@ -45,7 +45,7 @@ export default function Home() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!recaptchaToken) {
-      setError('Por favor, confirme o reCAPTCHA.');
+      setError('Please, confirm the reCAPTCHA.');
       return;
     }
     setLoading(true);
@@ -54,7 +54,7 @@ export default function Home() {
     setCopied(false);
     try {
       const body = { url: inputUrl };
-      if (customUrl) body.customUrl = customUrl;
+      if (customUrl) body.custom = customUrl;
       const res = await fetch('https://shorten-url-production-3f16.up.railway.app/api/v1/shorten', {
         method: 'POST',
         headers: { 
@@ -63,7 +63,16 @@ export default function Home() {
         },
         body: JSON.stringify(body)
       });
-      if (!res.ok) throw new Error('Erro ao encurtar a URL');
+      if (!res.ok) {
+        let errorMsg = 'Erro ao encurtar a URL';
+        try {
+          const errorData = await res.json();
+          if (res.status === 400 && errorData.code === 40001) {
+            errorMsg = 'This url is not available.';
+          }
+        } catch {}
+        throw new Error(errorMsg);
+      }
       const data = await res.json();
       setResult(data);
     } catch (err) {
@@ -102,14 +111,15 @@ export default function Home() {
   <div style={{ display: 'flex', flexDirection: 'row', gap: 10, width: '100%', marginBottom: 14 }}>
     <input
       type="text"
-      placeholder="Custom url (opcional)"
+      placeholder="Custom url (optional)"
       value={customUrl}
       onChange={e => setCustomUrl(e.target.value)}
       className="input-modern"
       style={{ flex: 1, marginBottom: 0 }}
     />
   </div>
-  <div style={{ marginBottom: 10, width: '100%' }}>
+
+  <div style={{ marginBottom: 10, width: '100%', display: 'flex', justifyContent: 'center' }}>
     <div
       id="g-recaptcha"
       className="g-recaptcha"
@@ -198,6 +208,28 @@ export default function Home() {
           outline: none;
         }
         .input-modern:focus {
+.recaptcha-wrapper {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+}
+.recaptcha-wrapper .g-recaptcha {
+  width: 100% !important;
+  min-width: 0;
+}
+.recaptcha-wrapper iframe {
+  width: 100% !important;
+  min-width: 0;
+  max-width: 100% !important;
+  display: block;
+}
+@media (max-width: 340px) {
+  .recaptcha-wrapper .g-recaptcha {
+    transform: scale(0.85);
+    transform-origin: 0 0;
+  }
+}
+
           border-color: #6366f1;
         }
         .btn-modern {
