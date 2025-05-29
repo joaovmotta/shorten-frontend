@@ -67,7 +67,7 @@ export default function Home() {
         let errorMsg = 'Erro ao encurtar a URL';
         try {
           const errorData = await res.json();
-          if (res.status === 400 && errorData.code === 40001) {
+          if (res.status === 400 && errorData.code === 400001) {
             errorMsg = 'This url is not available.';
           }
         } catch {}
